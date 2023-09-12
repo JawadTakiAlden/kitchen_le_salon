@@ -1,25 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { Route, Routes, useLocation } from 'react-router'
+import Login from './pages/Login'
+import Orders from './pages/Order/Orders'
+import { Box, Container, CssBaseline, ThemeProvider, createTheme } from '@mui/material'
+import './App.css'
+import Header from './components/Header'
+import { RequireAuth } from './context'
 
-function App() {
+const defaultTheme = createTheme();
+
+const App = () => {
+  const location = useLocation()
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <ThemeProvider theme={defaultTheme}>
+        <CssBaseline />
+        <Box
+          sx={{
+            paddingLeft : {xs : '5px' , sm : '20px' , md : '30px' , lg : '40px'},
+            paddingRight : {xs : '5px' , sm : '20px' , md : '30px' , lg : '40px'},
+          }}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+          {
+            location.pathname !== '/' && (
+              <Header />
+            )
+          }
+          <Routes>
+            <Route path='/' element={<Login />} />
+            <Route path='/orders' element={<RequireAuth><Orders /></RequireAuth>} />
+          </Routes>
+        </Box>
+    </ThemeProvider >
+  )
 }
 
-export default App;
+export default App
