@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import productImage from '../../assets/triangle-background-with-vivid-colors_52683-31218.jpg'
 import { Box, Button, Grid, Typography } from '@mui/material'
 import OrderCard from './OrderCard'
@@ -7,80 +7,38 @@ import { useQuery } from '@tanstack/react-query'
 import { Circles } from 'react-loader-spinner'
 import { useNavigate } from 'react-router'
 import noDataImage from '../../assets/no-data-concept-illustration_114360-536.png'
-
-const orders = [
-    {
-        id : '1',
-        total : '2400',
-        table_id : '10',
-        order_items : [
-            {
-                id : '1',
-                prodcut_name : 'coffe',
-                total : 2400,
-                quantity : 6,
-                image : productImage
-            }
-        ]
-    },
-    {
-        id : '2',
-        total : '2400',
-        table_id : '10',
-        order_items : [
-            {
-                id : '1',
-                prodcut_name : 'coffe',
-                total : 2400,
-                quantity : 6,
-                image : productImage
-            }
-        ]
-    },
-    {
-        id : '3',
-        total : '2400',
-        table_id : '10',
-        order_items : [
-            {
-                id : '1',
-                prodcut_name : 'coffe',
-                total : 2400,
-                quantity : 6,
-                image : productImage
-            }
-        ]
-    },
-    {
-        id : '4',
-        total : '2400',
-        table_id : '10',
-        order_items : [
-            {
-                id : '1',
-                prodcut_name : 'coffe',
-                total : 2400,
-                quantity : 6,
-                image : productImage
-            }
-        ]
-    },
-]
-
-const getOrders = () => {
-    return request({
-        url : '/kitchen-orders'
-    })
-}
+import { useDispatch, useSelector } from 'react-redux'
+import { addOrder, deleteOrder, fetchOrders } from '../../store/slices/order_slice'
+import Pusher from 'pusher-js';
 
 const Orders = () => {
+    const {isLoading , orders , error} = useSelector((state) => state.orders)
+    const dispatch = useDispatch()
     const navigate = useNavigate()
-    const ordersQuery = useQuery({
-        queryKey : ['get-orders-from-server'],
-        queryFn : getOrders
-    })
 
-    if(ordersQuery.isLoading){
+    useEffect(() => {
+        dispatch(fetchOrders())
+        const pusher = new Pusher('2f639068bbf020a6b33d', {
+            cluster: 'mt1'
+          });
+      
+          const channel = pusher.subscribe('notifications');
+      
+          channel.bind('new-notification', (data) => {
+            if(data.notification.type === 'move-order-to-casher'){
+                dispatch(addOrder([data.order]))
+            }else if(data.notification.type === 'order-paid'){
+                dispatch(deleteOrder(data.order.id))
+            }
+          });
+
+          return () => {
+            channel.unbind();
+            pusher.disconnect();
+          }
+    } , [])
+
+    if(isLoading){
         return <Box
             sx={{
                 display : 'flex',
@@ -101,93 +59,40 @@ const Orders = () => {
       </Box>
     }
 
-    if(ordersQuery.isError){
-        if(ordersQuery.error.response){
-            if(ordersQuery.error.response.status === 401){
-                navigate('/')
-            }else {
-                return <Box
-                    sx={{
-                        display : 'flex',
-                        alignItems : 'center',
-                        justifyContent : 'center',
-                        width : '100%',
-                        height : 'calc(100vh - 80px)'
-                    }}
-                >
-                    <Typography
-                    variant='h4'
-                    sx={{
-                        textAlign : 'center'
-                    }}
-                >
-                    Unknown Error With Status Code : {ordersQuery.error.response.status}
-                </Typography>
-                <Button>
-                    Retry
-                </Button>
-                </Box>
-            }
-        }else if(ordersQuery.error.request) {
-            return <Box
-                sx={{
-                    display : 'flex',
-                    alignItems : 'center',
-                    justifyContent : 'center',
-                    width : '100%',
-                    height : 'calc(100vh - 80px)'
-                }}
-            >
-                <Typography
-                variant='h4'
-                sx={{
-                    textAlign : 'center'
-                }}
-            >
-                No Response Recived From Server
-            </Typography>
-            <Button
-                onClick={() => {
-                    ordersQuery.refetch()
-                }}
-            >
-                Retry
-            </Button>
-            </Box>
-        }else {
-            return <Box
-                sx={{
-                    display : 'flex',
-                    alignItems : 'center',
-                    justifyContent : 'center',
-                    width : '100%',
-                    height : 'calc(100vh - 80px)'
-                }}
-            >
-                <Typography
-                variant='h4'
-                sx={{
-                    textAlign : 'center'
-                }}
-            >
-                Unkonwn Error Happened
-            </Typography>
-            <Button
-                onClick={() => {
-                    ordersQuery.refetch()
-                }}
-            >
-                Retry
-            </Button>
-            </Box>
-        }
+    if(error){
+        return <Box
+        sx={{
+            display : 'flex',
+            alignItems : 'center',
+            justifyContent : 'center',
+            width : '100%',
+            height : 'calc(100vh - 80px)',
+            flexDirection : 'column'
+        }}
+    >
+        <Typography
+        variant='h5'
+        sx={{
+            textAlign : 'center',
+            marginBottom :'10px'
+        }}
+    >
+        Unknown Error With Message : {error}
+    </Typography>
+    <Button
+        variant='contained'
+        onClick={() => {
+            dispatch(fetchOrders())
+        }}
+    >
+        Retry
+    </Button>
+    </Box>
     }
-
-    console.log(ordersQuery.data.data.data)
   return (
     <Box >
         {
-            ordersQuery.data.data.data.length === 0 && (
+            orders.length === 0 && (
                 <Box
                     sx={{
                             position : 'absolute',
@@ -210,7 +115,7 @@ const Orders = () => {
         }
         <Grid container spacing={4}>
             {
-                ordersQuery.data.data.data.map(order => (
+                orders.map(order => (
                     <Grid item xs={12} sm={6}>
                         <OrderCard order={order} />
                     </Grid>

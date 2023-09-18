@@ -4,6 +4,7 @@ import OrderItem from './OrderItem'
 import Slide from '@mui/material/Slide';
 import { useMutation } from '@tanstack/react-query';
 import { request } from '../../api/request';
+import { Circles } from 'react-loader-spinner';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -11,7 +12,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const moveToRunnerRequest = (id) => {
     return request({
-        url : `/order-to-runner/${id}`,
+        url : `/order-to-paid/${id}`,
         method : 'patch',
     })
 }
@@ -22,6 +23,8 @@ const OrderCard = ({order}) => {
     const [alterOpen, setAlterOpen] = React.useState(false);
     const [message , setMessage] = React.useState('')
     const [messageType , setMessageType] = React.useState('error')
+
+    console.log(order)
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -43,8 +46,9 @@ const OrderCard = ({order}) => {
         mutationFn : moveToRunnerRequest,
         onSuccess : (data) => {
             setMessage('Order Move On To Runner Successfully')
-                  setMessageType('error')
-                  setAlterOpen(true)
+            setMessageType('success')
+            setAlterOpen(true)
+            setOpen(false)
         },
           onError : (error) => {
             if (error.response){
@@ -95,6 +99,35 @@ const OrderCard = ({order}) => {
     const handelConfirm = () => {
         toRunnerMutation.mutate(order.id)
     }
+
+
+    if(toRunnerMutation.isLoading){
+      return <Box
+      sx={{
+          display : 'flex',
+          alignItems : 'center',
+          justifyContent : 'center',
+          position : 'absolute',
+          backgroundColor : 'white',
+          left : '0',
+          top : '0',
+          width : '100%',
+          height : '100%',
+          minHeight : '100vh',
+          zIndex : '10'
+      }}
+  ><Circles
+  height="80"
+  width="80"
+  color="#59c2ff"
+  ariaLabel="circles-loading"
+  wrapperStyle={{}}
+  wrapperClass=""
+  visible={true}
+/>
+</Box>
+    }
+
   return (
     <>
     <Box

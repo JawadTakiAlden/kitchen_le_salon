@@ -6,6 +6,8 @@ import { Box, Container, CssBaseline, ThemeProvider, createTheme } from '@mui/ma
 import './App.css'
 import Header from './components/Header'
 import { RequireAuth } from './context'
+import Notification from './components/Notification'
+import { SnackbarProvider } from 'notistack'
 
 const defaultTheme = createTheme();
 
@@ -13,6 +15,7 @@ const App = () => {
   const location = useLocation()
   return (
     <ThemeProvider theme={defaultTheme}>
+      <SnackbarProvider maxSnack={3}>
         <CssBaseline />
         <Box
           sx={{
@@ -30,6 +33,8 @@ const App = () => {
             <Route path='/orders' element={<RequireAuth><Orders /></RequireAuth>} />
           </Routes>
         </Box>
+        <Notification />
+        </SnackbarProvider>
     </ThemeProvider >
   )
 }

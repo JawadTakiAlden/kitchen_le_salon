@@ -1,5 +1,6 @@
 import { Avatar, Box, Card, CardContent, Typography } from '@mui/material'
 import React from 'react'
+import { imageBaseURL } from '../../api/request'
 
 const OrderItem = ({orderItem}) => {
   return (
@@ -17,7 +18,7 @@ const OrderItem = ({orderItem}) => {
       >
         <Avatar 
           alt="Profile Image" 
-          src={orderItem.image} 
+          src={`${imageBaseURL}${orderItem.meal.image}`} 
           className="profile-image" 
           sx={{ width: 60, height: 60 }}
         />

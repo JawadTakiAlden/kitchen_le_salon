@@ -11,18 +11,18 @@ JawadAuth.displayName = "JawadAuthContext";
 function reducer(state, action) {
     switch (action.type) {
       case 'login' : {
-        Cookies.set('_kitchen_le_salon_token' , action.value.token)
-        Cookies.set('_is_kitchen_le_salon_auth' , true)
+        Cookies.set('_casher_le_salon_token' , action.value.token)
+        Cookies.set('_is_casher_le_salon_auth' , true)
         return {
             isAuth : true,
             user : action.value.user,
-            token : Cookies.get('_kitchen_le_salon_token')
+            token : Cookies.get('_casher_le_salon_token')
         }
       }
       case 'logout' : {
-        Cookies.remove('_kitchen_le_salon_token')
+        Cookies.remove('_casher_le_salon_token')
         Cookies.remove('_profile')
-        Cookies.remove('_is_kitchen_le_salon_auth')
+        Cookies.remove('_is_casher_le_salon_auth')
         return {
             ...state,
             isAuth : false,
@@ -40,8 +40,8 @@ function reducer(state, action) {
 function JawadAuthControllerProvider({ children }) {
     const initialState = {
       user : Cookies.get('_profile'),
-      isAuth : Cookies.get('_is_kitchen_le_salon_auth'),
-      token : Cookies.get('_kitchen_le_salon_token')
+      isAuth : Cookies.get('_is_casher_le_salon_auth'),
+      token : Cookies.get('_casher_le_salon_token')
     };
   
     const [controller, dispatch] = useReducer(reducer, initialState);

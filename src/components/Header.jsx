@@ -24,7 +24,7 @@ const Header = () => {
             color={'#59c2ff'}
             variant='h5'
         >
-            Kitchen Dashboard
+            Casher Dashboard
         </Typography>
         <Box>
             <Button
