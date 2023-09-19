@@ -127,7 +127,7 @@ const OrderCard = ({order}) => {
 />
 </Box>
     }
-
+console.log(order)
   return (
     <>
     <Box
@@ -167,12 +167,17 @@ const OrderCard = ({order}) => {
                     {`Table Number: ${order.table_id}`}
                 </Typography>
                 <Typography
+                    >
+                    {`Receipt ID : ${order.receipt_id}`}
+                </Typography>
+                <Typography
                     sx={{
                         marginBottom : '10px'
                     }}
                     >
                     {`Total : ${order.total}`}
                 </Typography>
+                
             </Box>
             <Box>
                 
